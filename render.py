@@ -6,11 +6,14 @@ only; no network, no external assets. Deterministic: fixed fonts, fixed
 layout, no timestamps or randomness in the output.
 """
 import textwrap
+import os
 
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1024, 1024
-OUT = "entry.png"
+# The grader mounts the repository read-only, so render into the path the
+# caller gives (main.py points it at the writable output directory).
+OUT = os.environ.get("ENTRY_OUT", "entry.png")
 
 # --- palette: midnight teal + warm amber + paper cream (new identity) ---
 INK = (14, 42, 58)        # deep teal-navy
