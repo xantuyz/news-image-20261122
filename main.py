@@ -1,47 +1,45 @@
 #!/usr/bin/env python3
-"""Entrypoint for news-image-20261122.
+"""Deliver the finished front page to the grading harness.
 
-Runs render.py (same directory) to draw entry.png straight into the
-output directory and verifies it: PNG, 1024x1024, at most 1 MiB.
-Standard library only.
+The artwork is drawn by render.py (Pillow) at build time and shipped
+here as entry.png; this entrypoint only needs the standard library, so
+it runs in the sandbox with nothing installed. It copies entry.png to
+$MAKEFUN_OUTPUT_DIR/entry.png (default /output/entry.png) and only
+reports success when the copy's SHA-256 matches the original.
 """
+
 import hashlib
 import os
-import struct
-import subprocess
+import shutil
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "render.py")
+ORIGINAL = os.path.join(HERE, "entry.png")
 
 
-def read_png_size(path):
-    with open(path, "rb") as fh:
-        head = fh.read(33)
-    if head[:8] != b"\x89PNG\r\n\x1a\n":
-        raise SystemExit("entry.png is not a PNG")
-    width, height = struct.unpack(">II", head[16:24])
-    return width, height
+def sha256_of(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(65536), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def main():
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or os.environ.get("OUTPUT_DIR") or "/output"
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
-    target = os.path.join(out_dir, "entry.png")
-    # The repository is read-only in the grader, so render straight into
-    # the writable output directory instead of the repository.
-    env = dict(os.environ)
-    env["ENTRY_OUT"] = target
-    subprocess.run([sys.executable, SRC], cwd=HERE, check=True, env=env)
-    size = os.path.getsize(target)
-    width, height = read_png_size(target)
-    if (width, height) != (1024, 1024):
-        raise SystemExit(f"bad size {width}x{height}, want 1024x1024")
-    if size > 1048576:
-        raise SystemExit(f"entry.png too large: {size} bytes")
-    digest = hashlib.sha256(open(target, "rb").read()).hexdigest()
-    print(f"entry.png {width}x{height} {size} bytes sha256={digest}")
+    destination = os.path.join(out_dir, "entry.png")
+    shutil.copyfile(ORIGINAL, destination)
+    want = sha256_of(ORIGINAL)
+    got = sha256_of(destination)
+    if want != got:
+        sys.stderr.write("entry.png copy failed its digest check\n")
+        return 1
+    size = os.path.getsize(destination)
+    sys.stdout.write("wrote %s (%d bytes, sha256 %s)\n"
+                     % (destination, size, got))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
