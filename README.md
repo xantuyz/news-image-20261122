@@ -7,8 +7,8 @@ Entry for the make.fun bounty: https://make.fun/bounty/news-image-20261122
 # The World Today — Sunday, 22 November 2026
 
 One image summing up the world's news of 22 November 2026, drawn by
-`render.py` (Python + PIL, no network, no external assets) and copied to
-`/output/entry.png` by `main.py` (standard library only).
+`render.py` (Python + PIL, no network, no external assets) and written
+straight into `/output/entry.png` by `main.py` (standard library only).
 
 ## The six stories
 
