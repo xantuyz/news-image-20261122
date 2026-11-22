@@ -2,15 +2,21 @@
 [![rank](https://make.fun/badge/news-image-20261122/xantuyz/news-image-20261122/rank.svg)](https://make.fun/bounty/news-image-20261122/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
 [![reward](https://make.fun/badge/news-image-20261122/xantuyz/news-image-20261122/reward.svg)](https://make.fun/bounty/news-image-20261122?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
 
+
 Entry for the make.fun bounty: https://make.fun/bounty/news-image-20261122
+
 
 # The World Today — Sunday, 22 November 2026
 
+
 One image summing up the world's news of 22 November 2026, drawn by
-`render.py` (Python + PIL, no network, no external assets) and written
-straight into `/output/entry.png` by `main.py` (standard library only).
+`render.py` (Python + PIL, build time only, no network, no external
+assets) and shipped as `entry.png`; `main.py` (standard library only)
+copies it into `/output/entry.png`.
+
 
 ## The six stories
+
 
 1. **Lead — Baltic Sea:** Russian cargo ship Sparta II hit by two drones
    in the Gulf of Finland on Saturday 21 November, caught fire and drifted
@@ -32,17 +38,24 @@ straight into `/output/entry.png` by `main.py` (standard library only).
    Crime Information Center (NCIC), its national crime database — the
    second intrusion into an FBI system in months.
 
+
 Sources: Reuters, CNN, AP, USGS.
 
+
 ## Run
+
 
 ```
 python3 main.py
 ```
 
-Writes `entry.png` (1024x1024 PNG, under 1 MiB) to `$MAKEFUN_OUTPUT_DIR`
-(or `/output`). Two runs produce byte-identical output.
+
+Copies the shipped `entry.png` (1024x1024 PNG, under 1 MiB) to
+`$MAKEFUN_OUTPUT_DIR` (or `/output`) and verifies its SHA-256.
+
 
 ## License
 
+
 MIT — see `LICENSE`.
+
