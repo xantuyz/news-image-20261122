@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """Entrypoint for news-image-20261122.
 
-Runs render.py (same directory) to draw entry.png, then copies the
-result to the output directory as entry.png and verifies it: PNG,
-1024x1024, at most 1 MiB. Standard library only.
+Runs render.py (same directory) to draw entry.png straight into the
+output directory and verifies it: PNG, 1024x1024, at most 1 MiB.
+Standard library only.
 """
 import hashlib
 import os
-import shutil
 import struct
 import subprocess
 import sys
@@ -28,10 +27,12 @@ def read_png_size(path):
 def main():
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or os.environ.get("OUTPUT_DIR") or "/output"
     os.makedirs(out_dir, exist_ok=True)
-    subprocess.run([sys.executable, SRC], cwd=HERE, check=True)
-    built = os.path.join(HERE, "entry.png")
     target = os.path.join(out_dir, "entry.png")
-    shutil.copyfile(built, target)
+    # The repository is read-only in the grader, so render straight into
+    # the writable output directory instead of the repository.
+    env = dict(os.environ)
+    env["ENTRY_OUT"] = target
+    subprocess.run([sys.executable, SRC], cwd=HERE, check=True, env=env)
     size = os.path.getsize(target)
     width, height = read_png_size(target)
     if (width, height) != (1024, 1024):
